@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import { PhotoService } from '../photo/photo.service';
 import { Photo } from '../photo/photo';
-import { Observable } from 'rxjs';
-import { PhotoComment } from '../photo/photo-comment';
+import { AlertService } from '../../shared/components/alert/alert.service';
 
 @Component({
   selector: 'app-photo-detail',
@@ -20,7 +20,8 @@ export class PhotoDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private photoService: PhotoService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) { }
 
   ngOnInit() {
@@ -32,9 +33,16 @@ export class PhotoDetailComponent implements OnInit {
   remove() {
     this.photoService
       .removePhoto(this.photoId)
-      .subscribe(() => {
-        this.router.navigate(['']);
-      });
+      .subscribe(
+        () => {
+          this.alertService.success('Photo removed');
+          this.router.navigate(['']);
+        },
+        err => {
+          console.log(err)
+          this.alertService.warning('Could not delete the photo!')
+        }
+      );
   }
 
 }
